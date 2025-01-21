@@ -1,0 +1,215 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+class DataNascimento
+{
+    public int Mes;
+    public int Ano;
+}
+
+class Gado
+{
+    public int Codigo;
+    public double LeiteSemanal; // Litros de leite por semana
+    public double AlimentoSemanal; // Quantidade de alimento ingerido por semana
+    public DataNascimento Nascimento;
+    public char Abate; // 'N' para não e 'S' para sim
+}
+
+class ControleFazenda
+{
+    static void LerDados(List<Gado> fazenda)
+    {
+        Console.Write("Quantas cabeças de gado há na fazenda? ");
+        int quantidade = int.Parse(Console.ReadLine());
+
+        for (int i = 0; i < quantidade; i++)
+        {
+            Gado gado = new Gado();
+            gado.Nascimento = new DataNascimento();
+
+            Console.WriteLine($"\nDigite os dados para o gado {i + 1}:");
+
+            Console.Write("Código: ");
+            gado.Codigo = int.Parse(Console.ReadLine());
+
+            Console.Write("Leite produzido por semana (em litros): ");
+            gado.LeiteSemanal = double.Parse(Console.ReadLine());
+
+            Console.Write("Alimento consumido por semana (em quilos): ");
+            gado.AlimentoSemanal = double.Parse(Console.ReadLine());
+
+            Console.Write("Mês de nascimento: ");
+            gado.Nascimento.Mes = int.Parse(Console.ReadLine());
+
+            Console.Write("Ano de nascimento: ");
+            gado.Nascimento.Ano = int.Parse(Console.ReadLine());
+
+            gado.Abate = 'N'; // Inicialmente o animal não vai para o abate
+
+            fazenda.Add(gado);
+        }
+    }
+
+    static void CalcularAbate(List<Gado> fazenda)
+    {
+        DateTime hoje = DateTime.Now;
+        foreach (Gado gado in fazenda)
+        {
+            // Calculando a idade do gado
+            int idade = hoje.Year - gado.Nascimento.Ano;
+
+            // Verificando se o gado deve ir para o abate
+            if (idade > 5 || gado.LeiteSemanal < 40)
+            {
+                gado.Abate = 'S'; // Gado vai para o abate
+            }
+        }
+    }
+
+    static double TotalLeite(List<Gado> fazenda)
+    {
+        double total = 0;
+        foreach (Gado gado in fazenda)
+        {
+            total += gado.LeiteSemanal;
+        }
+        return total;
+    }
+
+    static double TotalAlimento(List<Gado> fazenda)
+    {
+        double total = 0;
+        foreach (Gado gado in fazenda)
+        {
+            total += gado.AlimentoSemanal;
+        }
+        return total;
+    }
+
+    static void ListarAbate(List<Gado> fazenda)
+    {
+        Console.WriteLine("\nAnimais que devem ir para o abate:");
+        bool encontrado = false;
+        foreach (Gado gado in fazenda)
+        {
+            if (gado.Abate == 'S')
+            {
+                Console.WriteLine($"Código: {gado.Codigo} | Leite: {gado.LeiteSemanal} | Alimento: {gado.AlimentoSemanal} | Nascimento: {gado.Nascimento.Mes}/{gado.Nascimento.Ano}");
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado)
+            Console.WriteLine("Nenhum animal precisa ir para o abate.");
+    }
+
+    static void SalvarDados(List<Gado> fazenda, string nomeArquivo)
+    {
+        using (StreamWriter writer = new StreamWriter(nomeArquivo))
+        {
+            foreach (Gado gado in fazenda)
+            {
+                writer.WriteLine($"{gado.Codigo},{gado.LeiteSemanal},{gado.AlimentoSemanal},{gado.Nascimento.Mes},{gado.Nascimento.Ano},{gado.Abate}");
+            }
+        }
+        Console.WriteLine("Dados salvos com sucesso!");
+    }
+
+    static void CarregarDados(List<Gado> fazenda, string nomeArquivo)
+    {
+        if (File.Exists(nomeArquivo))
+        {
+            using (StreamReader reader = new StreamReader(nomeArquivo))
+            {
+                string linha;
+                while ((linha = reader.ReadLine()) != null)
+                {
+                    string[] dados = linha.Split(',');
+
+                    Gado gado = new Gado();
+                    gado.Nascimento = new DataNascimento();
+
+                    gado.Codigo = int.Parse(dados[0]);
+                    gado.LeiteSemanal = double.Parse(dados[1]);
+                    gado.AlimentoSemanal = double.Parse(dados[2]);
+                    gado.Nascimento.Mes = int.Parse(dados[3]);
+                    gado.Nascimento.Ano = int.Parse(dados[4]);
+                    gado.Abate = char.Parse(dados[5]);
+
+                    fazenda.Add(gado);
+                }
+            }
+            Console.WriteLine("Dados carregados com sucesso!");
+        }
+        else
+        {
+            Console.WriteLine("Arquivo não encontrado.");
+        }
+    }
+
+    static int Menu()
+    {
+        Console.WriteLine("\n*** Sistema de Controle de Fazenda ***");
+        Console.WriteLine("1 - Ler Dados");
+        Console.WriteLine("2 - Calcular Abate");
+        Console.WriteLine("3 - Total de Leite Produzido por Semana");
+        Console.WriteLine("4 - Total de Alimento Consumido por Semana");
+        Console.WriteLine("5 - Listar Animais que Devem Ir para o Abate");
+        Console.WriteLine("6 - Salvar Dados em Arquivo");
+        Console.WriteLine("7 - Carregar Dados de Arquivo");
+        Console.WriteLine("0 - Sair");
+        Console.Write("Escolha uma opção: ");
+        return int.Parse(Console.ReadLine());
+    }
+
+    static void Main()
+    {
+        List<Gado> fazenda = new List<Gado>();
+        int opcao;
+
+        CarregarDados(fazenda, "dados.txt");
+
+        do
+        {
+            opcao = Menu();
+            switch (opcao)
+            {
+                case 1:
+                    LerDados(fazenda);
+                    break;
+                case 2:
+                    CalcularAbate(fazenda);
+                    break;
+                case 3:
+                    Console.WriteLine($"Total de leite produzido por semana: {TotalLeite(fazenda)} litros");
+                    break;
+                case 4:
+                    Console.WriteLine($"Total de alimento consumido por semana: {TotalAlimento(fazenda)} quilos");
+                    break;
+                case 5:
+                    ListarAbate(fazenda);
+                    break;
+                case 6:
+                    Console.Write("Digite o nome do arquivo para salvar: ");
+                    string salvarArquivo = Console.ReadLine();
+                    SalvarDados(fazenda, salvarArquivo);
+                    break;
+                case 7:
+                    Console.Write("Digite o nome do arquivo para carregar: ");
+                    string carregarArquivo = Console.ReadLine();
+                    CarregarDados(fazenda, carregarArquivo);
+                    break;
+                case 0:
+                    Console.WriteLine("Saindo do programa...");
+                    SalvarDados(fazenda, "dados.txt");
+                    break;
+            }
+
+            Console.ReadKey();
+            Console.Clear();
+
+        } while (opcao != 0);
+    }
+}
