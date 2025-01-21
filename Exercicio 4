@@ -1,0 +1,220 @@
+using System;
+using System.Collections.Generic;
+
+class RegistroEmprestimo
+{
+    public DateTime DataEmprestimo;
+    public string NomePessoa;
+    public char StatusEmprestimo; // 'S' ou 'N'
+}
+
+class VideoGame
+{
+    public string Titulo;
+    public string Console;
+    public int AnoLancamento;
+    public int Ranking;
+    public RegistroEmprestimo Emprestimo;
+}
+
+class SistemaCatalogoJogos
+{
+    static void AdicionarJogo(List<VideoGame> catalogoJogos)
+    {
+        VideoGame novoJogo = new VideoGame();
+        novoJogo.Emprestimo = new RegistroEmprestimo();
+
+        Console.WriteLine("*** Dados do Jogo ***");
+        Console.Write("Título: ");
+        novoJogo.Titulo = Console.ReadLine();
+        Console.Write("Console: ");
+        novoJogo.Console = Console.ReadLine();
+        Console.Write("Ano: ");
+        novoJogo.AnoLancamento = int.Parse(Console.ReadLine());
+        Console.Write("Ranking: ");
+        novoJogo.Ranking = int.Parse(Console.ReadLine());
+
+        novoJogo.Emprestimo.StatusEmprestimo = 'N'; // Inicialmente não emprestado
+
+        catalogoJogos.Add(novoJogo);
+        Console.WriteLine("Jogo adicionado com sucesso!");
+    }
+
+    static void ListarJogos(List<VideoGame> catalogoJogos)
+    {
+        Console.WriteLine("*** Jogos Cadastrados ***");
+        for (int i = 0; i < catalogoJogos.Count; i++)
+        {
+            VideoGame jogo = catalogoJogos[i];
+            Console.WriteLine($"Título: {jogo.Titulo}");
+            Console.WriteLine($"Console: {jogo.Console}");
+            Console.WriteLine($"Ano: {jogo.AnoLancamento}");
+            Console.WriteLine($"Ranking: {jogo.Ranking}");
+            Console.WriteLine($"Emprestado: {(jogo.Emprestimo.StatusEmprestimo == 'S' ? "Sim" : "Não")}");
+            if (jogo.Emprestimo.StatusEmprestimo == 'S')
+            {
+                Console.WriteLine($"Pessoa: {jogo.Emprestimo.NomePessoa}");
+                Console.WriteLine($"Data de Empréstimo: {jogo.Emprestimo.DataEmprestimo.ToString("dd/MM/yyyy")}");
+            }
+            Console.WriteLine("-----------------------------");
+        }
+    }
+
+    static void ProcurarPorTitulo(List<VideoGame> catalogoJogos, string tituloBusca)
+    {
+        bool encontrado = false;
+        foreach (VideoGame jogo in catalogoJogos)
+        {
+            if (jogo.Titulo.Contains(tituloBusca, StringComparison.OrdinalIgnoreCase))
+            {
+                encontrado = true;
+                Console.WriteLine($"Título: {jogo.Titulo}");
+                Console.WriteLine($"Console: {jogo.Console}");
+                Console.WriteLine($"Ano: {jogo.AnoLancamento}");
+                Console.WriteLine($"Ranking: {jogo.Ranking}");
+                Console.WriteLine($"Emprestado: {(jogo.Emprestimo.StatusEmprestimo == 'S' ? "Sim" : "Não")}");
+                if (jogo.Emprestimo.StatusEmprestimo == 'S')
+                {
+                    Console.WriteLine($"Pessoa: {jogo.Emprestimo.NomePessoa}");
+                    Console.WriteLine($"Data de Empréstimo: {jogo.Emprestimo.DataEmprestimo.ToString("dd/MM/yyyy")}");
+                }
+                Console.WriteLine("-----------------------------");
+            }
+        }
+
+        if (!encontrado)
+            Console.WriteLine("Jogo não encontrado.");
+    }
+
+    static void ListarPorConsole(List<VideoGame> catalogoJogos, string consoleBusca)
+    {
+        bool encontrado = false;
+        foreach (VideoGame jogo in catalogoJogos)
+        {
+            if (jogo.Console.Equals(consoleBusca, StringComparison.OrdinalIgnoreCase))
+            {
+                encontrado = true;
+                Console.WriteLine($"Título: {jogo.Titulo}");
+                Console.WriteLine($"Console: {jogo.Console}");
+                Console.WriteLine($"Ano: {jogo.AnoLancamento}");
+                Console.WriteLine($"Ranking: {jogo.Ranking}");
+                Console.WriteLine($"Emprestado: {(jogo.Emprestimo.StatusEmprestimo == 'S' ? "Sim" : "Não")}");
+                if (jogo.Emprestimo.StatusEmprestimo == 'S')
+                {
+                    Console.WriteLine($"Pessoa: {jogo.Emprestimo.NomePessoa}");
+                    Console.WriteLine($"Data de Empréstimo: {jogo.Emprestimo.DataEmprestimo.ToString("dd/MM/yyyy")}");
+                }
+                Console.WriteLine("-----------------------------");
+            }
+        }
+
+        if (!encontrado)
+            Console.WriteLine("Nenhum jogo encontrado para este console.");
+    }
+
+    static void EmprestarJogo(List<VideoGame> catalogoJogos, string tituloEmprestimo)
+    {
+        bool encontrado = false;
+        foreach (VideoGame jogo in catalogoJogos)
+        {
+            if (jogo.Titulo.Equals(tituloEmprestimo, StringComparison.OrdinalIgnoreCase) && jogo.Emprestimo.StatusEmprestimo == 'N')
+            {
+                encontrado = true;
+                Console.WriteLine($"Título: {jogo.Titulo}");
+                Console.WriteLine($"Console: {jogo.Console}");
+                Console.WriteLine($"Ano: {jogo.AnoLancamento}");
+                Console.WriteLine($"Ranking: {jogo.Ranking}");
+                Console.WriteLine("Digite o nome da pessoa que vai pegar o jogo:");
+                jogo.Emprestimo.NomePessoa = Console.ReadLine();
+                jogo.Emprestimo.DataEmprestimo = DateTime.Now;
+                jogo.Emprestimo.StatusEmprestimo = 'S';
+                Console.WriteLine("Jogo emprestado com sucesso!");
+                break;
+            }
+        }
+
+        if (!encontrado)
+            Console.WriteLine("Jogo não encontrado ou já emprestado.");
+    }
+
+    static void DevolverJogo(List<VideoGame> catalogoJogos, string tituloDevolucao)
+    {
+        bool encontrado = false;
+        foreach (VideoGame jogo in catalogoJogos)
+        {
+            if (jogo.Titulo.Equals(tituloDevolucao, StringComparison.OrdinalIgnoreCase) && jogo.Emprestimo.StatusEmprestimo == 'S')
+            {
+                encontrado = true;
+                Console.WriteLine($"Título: {jogo.Titulo}");
+                Console.WriteLine($"Console: {jogo.Console}");
+                Console.WriteLine($"Ano: {jogo.AnoLancamento}");
+                Console.WriteLine($"Ranking: {jogo.Ranking}");
+                Console.WriteLine($"Pessoa: {jogo.Emprestimo.NomePessoa}");
+                Console.WriteLine($"Data de Empréstimo: {jogo.Emprestimo.DataEmprestimo.ToString("dd/MM/yyyy")}");
+                Console.WriteLine("O jogo foi devolvido. Alterando o status para 'Não emprestado'.");
+                jogo.Emprestimo.StatusEmprestimo = 'N';
+                Console.WriteLine("Jogo devolvido com sucesso!");
+                break;
+            }
+        }
+
+        if (!encontrado)
+            Console.WriteLine("Jogo não encontrado ou não está emprestado.");
+    }
+
+    static void ListarJogosEmprestados(List<VideoGame> catalogoJogos)
+    {
+        bool encontrado = false;
+        foreach (VideoGame jogo in catalogoJogos)
+        {
+            if (jogo.Emprestimo.StatusEmprestimo == 'S')
+            {
+                encontrado = true;
+                Console.WriteLine($"Título: {jogo.Titulo}");
+                Console.WriteLine($"Console: {jogo.Console}");
+                Console.WriteLine($"Ano: {jogo.AnoLancamento}");
+                Console.WriteLine($"Ranking: {jogo.Ranking}");
+                Console.WriteLine($"Emprestado para: {jogo.Emprestimo.NomePessoa}");
+                Console.WriteLine($"Data de Empréstimo: {jogo.Emprestimo.DataEmprestimo.ToString("dd/MM/yyyy")}");
+                Console.WriteLine("-----------------------------");
+            }
+        }
+
+        if (!encontrado)
+            Console.WriteLine("Nenhum jogo está emprestado.");
+    }
+
+    static int Menu()
+    {
+        Console.WriteLine("*** Sistema de Catálogo de Jogos ***");
+        Console.WriteLine("1 - Adicionar Jogo");
+        Console.WriteLine("2 - Listar Todos os Jogos");
+        Console.WriteLine("3 - Procurar Jogo por Título");
+        Console.WriteLine("4 - Listar Jogos por Console");
+        Console.WriteLine("5 - Emprestar Jogo");
+        Console.WriteLine("6 - Devolver Jogo");
+        Console.WriteLine("7 - Listar Jogos Emprestados");
+        Console.WriteLine("0 - Sair");
+        Console.Write("Escolha uma opção: ");
+        return int.Parse(Console.ReadLine());
+    }
+
+    static void Main()
+    {
+        List<VideoGame> catalogoJogos = new List<VideoGame>();
+        int opcao;
+
+        do
+        {
+            opcao = Menu();
+            switch (opcao)
+            {
+                case 1:
+                    AdicionarJogo(catalogoJogos);
+                    break;
+                case 2:
+                    ListarJogos(catalogoJogos);
+                    break;
+                case 3:
+                    Console.Write("Digite o título do jogo: ");
+                    string tituloBusca
